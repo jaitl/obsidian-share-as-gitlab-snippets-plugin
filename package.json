@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "obsidian-share-to-gitlab-snippets-plugin",
+	"version": "0.0.1",
+	"description": "This plugin allows you to share any of your notes to GitLab Snippets",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
