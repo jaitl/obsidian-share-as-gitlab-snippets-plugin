@@ -1,13 +1,18 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { sharePublic, updatePublic } from 'src/gitlab_client';
+import { saveSnippetUrl, extractSnippetUrl, extractFileBody } from 'src/obsidian_client';
+import { extractIdFromSnippetUrl } from 'src/utils'
 
 // Remember to rename these classes and interfaces!
 
 interface ShareToGitLabSnippetsPluginSettings {
-	mySetting: string;
+	gitlabUrl: string;
+	accessToken: string;
 }
 
 const DEFAULT_SETTINGS: ShareToGitLabSnippetsPluginSettings = {
-	mySetting: 'default'
+	gitlabUrl: 'https://gitlab.com',
+	accessToken: ''
 }
 
 export default class ShareToGitLabSnippetsPlugin extends Plugin {
@@ -16,66 +21,34 @@ export default class ShareToGitLabSnippetsPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
+			id: 'share-or-update-public-snippet',
+			name: 'share or update public snippet',
+			callback: async() => {
+				const curFile = this.app.workspace.getActiveFile();
+				if (curFile == null) return;
+				const fileName = curFile.basename
+				const fileBody = await extractFileBody(curFile, this.app);
+				const snippetUrl = extractSnippetUrl(curFile, this.app)
+				if (snippetUrl == null) {
+					const url = await sharePublic(this.settings.gitlabUrl, this.settings.accessToken, fileName, fileBody)
+					await saveSnippetUrl(url, curFile, this.app);
+					new Notice(`shared to ${url}`)
+				} else {
+					const snippetId = extractIdFromSnippetUrl(snippetUrl)
+					if (snippetId == null) {
+						new Notice(`snippetId not found in ${snippetUrl}`)
+						return
 					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
+					const url = await updatePublic(this.settings.gitlabUrl, this.settings.accessToken, snippetId, fileName, fileBody)
+					new Notice(`shared to ${url}`)
 				}
 			}
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new ShareToGitLabSnippetsSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
@@ -88,22 +61,6 @@ export default class ShareToGitLabSnippetsPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
 	}
 }
 
@@ -121,13 +78,21 @@ class ShareToGitLabSnippetsSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('GitLab url')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				.setValue(this.plugin.settings.gitlabUrl)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.gitlabUrl = value;
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('GitLab access token')
+			.setDesc('Token must have access to api scope')
+			.addText(text => text
+				.setPlaceholder('Enter GitLab access token')
+				.setValue(this.plugin.settings.accessToken)
+				.onChange(async (value) => {
+					this.plugin.settings.accessToken = value;
 					await this.plugin.saveSettings();
 				}));
 	}
