@@ -32,7 +32,7 @@ jobs:
       - name: Upload zip archive
         uses: Shopify/upload-to-release@v1.0.1
         with:
-          name: ${{ env.PLUGIN_NAME }}-$GITHUB_REF_NAME.zip
+          name: ${{ env.PLUGIN_NAME }}-${{GITHUB_REF_NAME}}.zip
           path: ${{ env.PLUGIN_NAME }}.zip
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           content-type: application/zip
