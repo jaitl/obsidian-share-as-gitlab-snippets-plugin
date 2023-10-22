@@ -1,7 +1,7 @@
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { sharePublic, updatePublic } from 'src/gitlab_client';
-import { saveSnippetUrl, extractSnippetUrl, extractFileBody } from 'src/obsidian_client';
-import { extractIdFromSnippetUrl } from 'src/utils'
+import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { sharePublic, updatePublic } from './gitlab_client';
+import { saveSnippetUrl, extractSnippetUrl, extractFileBody } from './obsidian_client';
+import { extractIdFromSnippetUrl } from './utils'
 
 // Remember to rename these classes and interfaces!
 
