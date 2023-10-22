@@ -1,9 +1,9 @@
 name: Release Obsidian plugin
 
 on:
-  push:
-    tags:
-      - '*.*.*'
+  release:
+    types:
+      - created
 
 env:
   PLUGIN_NAME: obsidian-share-to-gitlab-snippets-plugin
