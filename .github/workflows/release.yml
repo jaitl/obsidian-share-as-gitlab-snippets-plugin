@@ -1,9 +1,9 @@
 name: Release Obsidian plugin
 
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - '*.*.*'
 
 env:
   PLUGIN_NAME: obsidian-share-to-gitlab-snippets-plugin
@@ -28,12 +28,11 @@ jobs:
           cp main.js manifest.json ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
           ls
-          echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
       - name: Upload zip archive
         uses: Shopify/upload-to-release@v1.0.1
         with:
-          name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
+          name: ${{ env.PLUGIN_NAME }}-$GITHUB_REF_NAME.zip
           path: ${{ env.PLUGIN_NAME }}.zip
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           content-type: application/zip
