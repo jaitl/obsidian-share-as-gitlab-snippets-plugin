@@ -1,5 +1,5 @@
 {
-	"id": "share-to-gitlab-snippets-plugin",
+	"id": "obsidian-share-to-gitlab-snippets-plugin",
 	"name": "Share to GitLab Snipptes",
 	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
