@@ -31,8 +31,7 @@ jobs:
           echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
       - name: Upload zip archive
-        id: upload_zip
-      - uses: Shopify/upload-to-release@v1
+        uses: Shopify/upload-to-release@v1
         with:
           name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
           path: ./${{ env.PLUGIN_NAME }}.zip
@@ -40,8 +39,7 @@ jobs:
           content-type: application/zip
 
       - name: Upload main.js
-        id: upload_main_js
-      - uses: Shopify/upload-to-release@v1
+        uses: Shopify/upload-to-release@v1
         with:
           name: main.js
           path: ./main.js
@@ -49,8 +47,7 @@ jobs:
           content-type: text/javascript
 
       - name: Upload manifest.json
-        id: upload_manifest_json
-      - uses: Shopify/upload-to-release@v1
+        uses: Shopify/upload-to-release@v1
         with:
           name: manifest.json
           path: ./manifest.json
