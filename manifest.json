@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-share-to-gitlab-snippets-plugin",
-	"name": "Share to GitLab Snipptes",
+	"id": "share-as-gitlab-snippets",
+	"name": "Share as GitLab Snipptes",
 	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
 	"description": "This plugin allows you to share any of your notes to GitLab Snippets",

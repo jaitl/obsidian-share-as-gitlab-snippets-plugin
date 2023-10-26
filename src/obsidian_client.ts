@@ -11,11 +11,11 @@ export const saveSnippetUrl = async(url: string, file: TFile, app: App): Promise
     });
 }
 
-export const extractSnippetUrl = (file: TFile, app: App): string | undefined => {
+export const extractSnippetUrl = (file: TFile, app: App): string | null => {
     const metadata = app.metadataCache.getFileCache(file)
     const frontmatter = metadata?.frontmatter
-    if (frontmatter == undefined) {
-        return undefined;
+    if (frontmatter == null) {
+        return null;
     }
     return frontmatter[SNIPPET_URL_PROPERTY_NAME]
 }

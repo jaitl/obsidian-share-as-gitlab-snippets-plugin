@@ -41,7 +41,7 @@ export default class ShareToGitLabSnippetsPlugin extends Plugin {
 						new Notice(`snippetId not found in ${snippetUrl}`)
 						return
 					}
-					const url = await updatePublic(this.settings.gitlabUrl, this.settings.accessToken, snippetId, fileName, fileBody)
+					const url = await updatePublic(this.settings.gitlabUrl, this.settings.accessToken, snippetId, fileBody)
 					new Notice(`shared to ${url}`)
 				}
 			}
@@ -49,10 +49,6 @@ export default class ShareToGitLabSnippetsPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new ShareToGitLabSnippetsSettingTab(this.app, this));
-	}
-
-	onunload() {
-
 	}
 
 	async loadSettings() {

@@ -6,9 +6,7 @@ export const sharePublic = async (url: string, token: string, fileName: string, 
         token: token
       });
 
-    const snippets = api.Snippets
-
-    const cFile: CreateSnippetOptions = {
+    const fileOptions: CreateSnippetOptions = {
         visibility: 'public',
         files: [
             {
@@ -18,19 +16,17 @@ export const sharePublic = async (url: string, token: string, fileName: string, 
         ]
     }
 
-    const res = await snippets.create(fileName, cFile)
+    const res = await api.Snippets.create(fileName, fileOptions)
     return res.web_url
 }
 
-export const updatePublic = async (url: string, token: string, snippetId: number, fileName: string, fileContent: string): Promise<string> => {
+export const updatePublic = async (url: string, token: string, snippetId: number, fileContent: string): Promise<string> => {
     const api = new Gitlab({
         host: url,
         token: token
       });
-
-    const snippets = api.Snippets
-
-    const cFile: EditSnippetOptions = {
+      
+    const fileOptions: EditSnippetOptions = {
         files: [
             {
                 content: fileContent,
@@ -40,6 +36,6 @@ export const updatePublic = async (url: string, token: string, snippetId: number
         ]
     }
 
-    const res = await snippets.edit(snippetId, cFile)
+    const res = await api.Snippets.edit(snippetId, fileOptions)
     return res.web_url
 }
