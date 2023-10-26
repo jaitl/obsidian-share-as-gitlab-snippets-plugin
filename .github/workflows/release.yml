@@ -6,7 +6,7 @@ on:
       - created
 
 env:
-  PLUGIN_NAME: obsidian-share-to-gitlab-snippets-plugin
+  PLUGIN_NAME: share-as-gitlab-snippets
 
 jobs:
   build:
